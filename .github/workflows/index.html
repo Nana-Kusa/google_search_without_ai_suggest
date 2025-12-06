@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Web Search (No AI)</title>
+    <!-- Tailwind CSS for styling (loaded via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for specific visual tweaks */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        .link-display {
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <main class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 md:p-12 transition-all duration-300">
+        
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Google Web Search Only</h1>
+            <p class="text-sm text-gray-500">AIによる提案（SGE）を除外し、従来のWeb検索結果のみを表示します。</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg aria-hidden="true" class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchInput" maxlength="500"
+                class="block w-full p-4 pl-10 text-lg text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-shadow shadow-sm" 
+                placeholder="検索語を入力してください..." autofocus>
+        </div>
+
+        <!-- Result Section (Link Container) -->
+        <div id="resultContainer" class="mt-8 opacity-0 transition-opacity duration-300 pointer-events-none">
+            <p class="text-sm text-gray-500 mb-2 font-medium">生成されたリンク:</p>
+            
+            <!-- The Generated Link -->
+            <a id="searchLink" href="#" target="_blank" rel="noopener noreferrer" 
+               class="block w-full p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg group transition-colors duration-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-blue-700 font-semibold text-lg flex items-center">
+                        <span id="linkText">検索を実行</span>
+                        <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </span>
+                </div>
+                <!-- URL Display (Optional, for transparency) -->
+                <div class="mt-2 text-xs text-gray-400 font-mono link-display" id="urlDisplay">
+                    https://www.google.com/search?q=...&udm=14
+                </div>
+            </a>
+
+            <div class="mt-2 text-center">
+                 <p class="text-xs text-gray-400">Enterキーを押すと直接移動します</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-8 text-xs text-gray-400">
+        Parameter used: <code class="bg-gray-200 px-1 py-0.5 rounded text-gray-600">&udm=14</code>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const resultContainer = document.getElementById('resultContainer');
+            const searchLink = document.getElementById('searchLink');
+            const linkText = document.getElementById('linkText');
+            const urlDisplay = document.getElementById('urlDisplay');
+
+            // Helper: Sanitize input (remove control characters)
+            // 制御文字（ASCII 0-31 および 127）を除去し、前後の空白を削除します
+            const sanitizeInput = (str) => {
+                return str.replace(/[\x00-\x1F\x7F]/g, '').trim();
+            };
+
+            // Function to generate the URL with &udm=14
+            const generateSearchUrl = (query) => {
+                const encodedQuery = encodeURIComponent(query);
+                // udm=14 forces the "Web" tab interface
+                return `https://www.google.com/search?q=${encodedQuery}&udm=14`;
+            };
+
+            // Event Listener for Input
+            searchInput.addEventListener('input', (e) => {
+                const rawValue = e.target.value;
+                // サニタイズ処理を通した値を使用
+                const query = sanitizeInput(rawValue);
+
+                if (query.length > 0) {
+                    const url = generateSearchUrl(query);
+                    
+                    // Update Link attributes
+                    searchLink.href = url;
+                    // textContent will automatically escape HTML characters, preventing XSS in the label
+                    linkText.textContent = `「${query}」をWebのみで検索`;
+                    urlDisplay.textContent = url;
+
+                    // Show container
+                    resultContainer.classList.remove('opacity-0', 'pointer-events-none');
+                    resultContainer.classList.add('opacity-100', 'pointer-events-auto');
+                } else {
+                    // Hide container if empty or invalid
+                    resultContainer.classList.remove('opacity-100', 'pointer-events-auto');
+                    resultContainer.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+
+            // Allow "Enter" key to trigger navigation immediately
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const rawValue = e.target.value;
+                    const query = sanitizeInput(rawValue);
+                    if (query.length > 0) {
+                        const url = generateSearchUrl(query);
+                        window.open(url, '_blank');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
