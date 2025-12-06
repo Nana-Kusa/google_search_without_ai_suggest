@@ -1,0 +1,1 @@
+google検索で「AIのサジェスト要らない」という方々がいるので、その方々向けにAIのサジェスト無いgoogle検索のURLを作成するgithub pagesです。
