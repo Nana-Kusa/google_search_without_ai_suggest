@@ -1,5 +1,7 @@
 google検索で「AIのサジェスト要らない」という方々がいるので、その方々向けにAIのサジェスト無いgoogle検索のURLを作成するgithub pagesです。
 といってもgoogle検索のURLに"udm=14"を付け加えているだけです。
 
+https://nana-kusa.github.io/google_search_without_ai_suggest/
+
 This is a GitHub Pages site for people who do not want AI suggestions in Google search, providing a Google search URL without AI suggestions.
 But only add "udm=14" for google seacrch URL.
